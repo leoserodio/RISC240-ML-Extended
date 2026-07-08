@@ -2,7 +2,7 @@
  * File: controlpath.sv
  */
 
-`include "constants.sv"
+`include "constants.sv" 
 
 module controlpath (
    input [3:0]       CCin,

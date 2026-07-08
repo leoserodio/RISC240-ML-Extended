@@ -1,8 +1,8 @@
 /*
- * File: datapath.v
+ * File: datapath.v (now .sv)
  * Created: 4/5/1998
  * Modules contained: datapath
- *
+ * 
  * Changelog:
  * 23 Oct 2009: Separated paths.v into datapath.v and controlpath.v
  * 17 Nov 2009: Minor updates to facilitate synthesis (mcbender)
@@ -13,6 +13,7 @@
  * 25 Apr 2013: Changed newMDR to tri (mromanko)
  * 8  Mar 2019: Changed to fit RISC240 spec (pbannai)
  * 4  Nov 2019: Changed MDR to fit Altera IP block (mgcai)
+ * 8 July 2026: Added ML datapath components (lserodio)
  */
 
 `include "constants.sv"
@@ -115,9 +116,9 @@ module datapath (
 
 
 
-   //=====================================================
-   //          ML / VECTOR EXTENSIONS
-   //=====================================================
+   //=====================================================//
+   //          ML / VECTOR EXTENSIONS                     //
+   //=====================================================//
 
    // First we add our reg file that will hold vector values for our more complex deep learning applications
    // We will reuse the instruction format from the original RISC240 (as such we have rs1, rs2, rd)
@@ -132,7 +133,7 @@ module datapath (
    assign vecWriteDataOut = vecWriteData;
    assign dotResultOut    = dotResult;
    assign accResultOut    = accResult;
-                          
+
    vector_regfile vfile(
     .outRS1(vecRS1),
     .outRS2(vecRS2),

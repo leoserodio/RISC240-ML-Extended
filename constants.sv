@@ -1,5 +1,5 @@
 /*
- * File: constants.v
+ * File: constants.v (.sv now)
  * Created: 4/5/1998
  * Modules contained: none
  *
@@ -19,7 +19,10 @@
  * 8  Mar 2019: Changed to fit RISC240 spec (pbannai)
  * 9  Apr 2019: Removing unnecessary ALU ops (saugatag)
  * 14 Apr 2019: Updating state values for consistency with sim240 (saugatag)
+ * 8 July 2026: Updated to account for new ML functionality (lserodio)
  */
+
+
 
 // Comment this line when simulating, uncomment when synthesizing.
 //`define synthesis

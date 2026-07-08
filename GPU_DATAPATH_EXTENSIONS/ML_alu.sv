@@ -1,3 +1,8 @@
+/*
+ * File: ML_alu.sv
+ *
+ * ALU module containing ai/ml operations.
+ */
 `include "constants.sv"
 
 // No flags here
@@ -14,7 +19,8 @@ module vector_alu (
       case (opcode)
          VEC_ADD: begin
             for (int i = 0; i < 8; i++)
-               out[i*8 +: 8] = inA[i*8 +: 8] + inB[i*8 +: 8];
+            // inA[i*8 +: 8] => starting at bit i*8, give me the next 8 bits (i=0 => inA[7:0])
+               out[i*8 +: 8] = inA[i*8 +: 8] + inB[i*8 +: 8]; 
          end
 
          VEC_MUL: begin
@@ -39,4 +45,4 @@ module vector_alu (
       endcase
    end
 
-endmodule
+endmodule : vector_alu
