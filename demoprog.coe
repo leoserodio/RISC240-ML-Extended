@@ -1,0 +1,12 @@
+; DEMO FILE
+memory_initialization_radix=16;
+memory_initialization_vector =
+3040,
+0ECE,
+3080,
+0240,
+30C0,
+B177,
+3100,
+5ACE,
+FE00,
