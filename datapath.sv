@@ -51,7 +51,7 @@ module datapath (
    input         reset_L);
 
    logic [15:0] regRS1, regRS2;
-   logic [15:0] memOut;
+   logic [15:0] memOut; // unused...
    logic [14:0] marOut;
    logic [3:0]  newCC;
    logic loadReg_L, loadPC_L, loadMDR_L, writeMD_L, loadMAR_L, loadIR_L;
@@ -63,7 +63,15 @@ module datapath (
    assign selRS1 = ir[5:3];
    assign selRS2 = ir[2:0];
 
+   logic [15:0] marPlus2;
+   logic [15:0] marInput;
+   assign marPlus2 = {marOut, 1'b0} + 16'd2;
+   assign marInput = (cPts.marSrc == MAR_INCREMENT) ? marPlus2 : aluResult; // choose increment or aluresult
+
    assign memAddr = {marOut, 1'b0};
+
+
+   
 
    // Instantiate the modules that we need:
    reg_file rfile(
@@ -103,12 +111,32 @@ module datapath (
 
    assign {loadIR_L, loadMAR_L, writeMD_L, loadPC_L, loadReg_L} = dest_out[4:0];
 
-   register #(.WIDTH(16)) memDataReg(.out(MDRout), .in(newMDR), .load_L(loadMDR_L),
-                                     .clock(clock), .reset_L(reset_L));
+   /*register #(.WIDTH(16)) memDataReg(.out(MDRout), .in(newMDR), .load_L(loadMDR_L),
+                                     .clock(clock), .reset_L(reset_L));*/
+   // MDR input logic
+   
+   logic [15:0] vecStoreData;
+   logic [15:0] inputMDR;
+   assign inputMDR = (cPts.vec_mem_op == VEC_MEM_STORE) ? vecStoreData : newMDR; 
+   // If we are doing a vector store operation, the MDR input comes from vecStoreData
+   register #(.WIDTH(16)) memDataReg(
+    .out(MDRout), 
+    .in(inputMDR), 
+    .load_L(loadMDR_L),
+    .clock(clock), 
+    .reset_L(reset_L));
+
    register #(.WIDTH(16)) pcReg(     .out(pc), .in(aluResult), .load_L(loadPC_L),
                                      .clock(clock), .reset_L(reset_L));
-   register #(.WIDTH(15)) memAddrReg(.out(marOut), .in(aluResult[15:1]), .load_L(loadMAR_L),
-                                     .clock(clock), .reset_L(reset_L));
+   /*register #(.WIDTH(15)) memAddrReg(.out(marOut), .in(aluResult[15:1]), .load_L(loadMAR_L),
+                                     .clock(clock), .reset_L(reset_L));*/
+   register #(.WIDTH(15)) memAddrReg(
+    .out(marOut),
+    .in(marInput[15:1]),
+    .load_L(loadMAR_L),
+    .clock(clock),
+    .reset_L(reset_L));
+
    register #(.WIDTH(16)) instrReg(  .out(ir), .in(aluResult), .load_L(loadIR_L),
                                      .clock(clock), .reset_L(reset_L));
    register #(.WIDTH(4)) condCodeReg(.out(condCodes), .in(newCC), .load_L(cPts.lcc_L),
@@ -156,11 +184,35 @@ module datapath (
     .inB(vecRS2),
     .opcode(cPts.vec_op)
   );
-  // for now: write vector ALU result back into vector regfile
-  assign vecWriteData = vecAluResult;
+
+
+  
+  // Vector load unit:
+  // combines four 16-bit MDR values into one 64-bit vector
+  logic [63:0] vectorLoadOut;
+  vector_load_unit vload(
+      .vectorOut(vectorLoadOut),
+      .mdrData(MDRout),
+      .laneSel(cPts.laneSel),
+      .loadLane_L(cPts.loadLane_L),
+      .clear(cPts.clearVecLoad),
+      .clock(clock),
+      .reset_L(reset_L)
+  );
+
+  // Vector store unit:
+  // selects one 16-bit lane from a 64-bit vector to store
+  vector_store_unit vstore(
+      .storeData(vecStoreData),
+      .vectorIn(vecRS2),
+      .laneSel(cPts.laneSel)
+  );
+  // MUX selects the data written back to the vector register file.
+  // ML ALU operations => write the vector ALU result.
+  // Vector load instructions => write vector created by the vector load unit.
+  assign vecWriteData = (cPts.vecWriteSrc == VEC_WRITE_LOAD) ? vectorLoadOut : vecAluResult;
 
   // dot product unit
-  
   dot_product_unit dotProduct(
       .out(dotResult),
       .inA(vecRS1),

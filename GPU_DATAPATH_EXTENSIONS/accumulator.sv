@@ -25,7 +25,7 @@ module accumulator (
         .cout()
     );
 
-    always_ff @(posedge clock or negedge reset_L) begin
+    always_ff @(posedge clock, negedge reset_L) begin
         if (~reset_L)
             out <= 32'sd0;
         else if (clear)

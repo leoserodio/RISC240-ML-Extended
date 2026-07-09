@@ -73,17 +73,22 @@ module controlpath (
            out = {F_A_MINUS_B, VEC_UNDEF, MUX_REG, MUX_REG, DEST_REG, LOAD_CC, NO_RD, NO_WR, 1'b1, 1'b1, 1'b0};
            nextState = FETCH;
         end
-
+        // ***************************************************************************************************
+        // ML ADDITIONS START HERE
+        //
+        //
+        //
+        // Vector addition
         VADD: begin
            out = {F_UNDEF, VEC_ADD, MUX_UNDEF, MUX_UNDEF, DEST_NONE, NO_LOAD, NO_RD, NO_WR, 1'b0, 1'b1, 1'b0};
            nextState = FETCH;
         end
-
+        // Vector Multiplication
         VMUL: begin
            out = {F_UNDEF, VEC_MUL, MUX_UNDEF, MUX_UNDEF, DEST_NONE, NO_LOAD, NO_RD, NO_WR, 1'b0, 1'b1, 1'b0};
            nextState = FETCH;
         end
-
+        // ReLU functionality
         VRELU: begin
            out = {F_UNDEF, VEC_RELU, MUX_UNDEF, MUX_UNDEF, DEST_NONE, NO_LOAD, NO_RD, NO_WR, 1'b0, 1'b1, 1'b0};
            nextState = FETCH;
@@ -100,7 +105,11 @@ module controlpath (
            out = {F_UNDEF, VEC_ACLR, MUX_UNDEF, MUX_UNDEF, DEST_NONE, NO_LOAD, NO_RD, NO_WR, 1'b1, 1'b1, 1'b1};
            nextState = FETCH;
         end
-
+        // ML ADDITION END HERE
+        //
+        //
+        //
+        // ***************************************************************************************************
         BRA: begin
            out = {F_A, VEC_UNDEF, MUX_PC, MUX_UNDEF, DEST_MAR, NO_LOAD, NO_RD, NO_WR, 1'b1, 1'b1, 1'b0};
            nextState = BRA1;

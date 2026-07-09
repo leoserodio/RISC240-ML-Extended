@@ -30,6 +30,59 @@
 `ifndef sv_CONSTANTS
 `define sv_CONSTANTS
 
+// *****************************************************************
+// ML ADDITIONS START HERE
+// MAR write source
+typedef enum logic {
+   MAR_FROM_ALU   = 1'b0,
+   MAR_INCREMENT  = 1'b1
+} mar_src_t; // MAR write source
+typedef enum logic{ // Vector register write source
+   VEC_WRITE_ALU  = 1'b0,
+   VEC_WRITE_LOAD = 1'b1
+} vec_write_src_t; // Vector register write source
+// Vector register write operation
+typedef enum logic{
+   LOAD_VEC_REG = 1'b0,
+   NO_VEC_REG   = 1'b1
+} vec_reg_load_t; // Vector register write operation
+
+// Accumulator load operation
+typedef enum logic{
+   LOAD_ACC     = 1'b0,
+   NO_ACC_LOAD  = 1'b1
+} acc_load_t; // Accumulator load operation
+
+// Accumulator clear operation
+typedef enum logic{
+   NO_ACC_CLEAR = 1'b0,
+   CLEAR_ACC    = 1'b1
+} acc_clear_t; // Accumulator clear operation
+
+// Vector lane select
+typedef enum logic [1:0]{
+   VEC_LANE0     = 2'b00,
+   VEC_LANE1     = 2'b01,
+   VEC_LANE2     = 2'b10,
+   VEC_LANE3     = 2'b11,
+   VEC_LANE_UNDEF = 2'bxx
+} vec_lane_t; // Vector lane select
+
+// Load vector lane operation
+typedef enum logic{
+   LOAD_VEC_LANE = 1'b0,
+   NO_VEC_LANE   = 1'b1
+} vec_lane_load_t; // Load vector lane operation
+
+// Clear vector load register operation
+typedef enum logic{
+   NO_VEC_CLEAR  = 1'b0,
+   CLEAR_VEC_LOAD = 1'b1
+} vec_clear_t; // Clear vector load register operation
+
+// ML ADDITIONS END HERE
+// *****************************************************************
+
 typedef enum logic[3:0]{ // ALU operation select
    F_A_PLUS_B    = 4'b0000,
    F_A_MINUS_B   = 4'b0001,
@@ -60,6 +113,14 @@ typedef enum logic [2:0] {
    VEC_PASS = 3'b011,
    VEC_UNDEF = 3'bxxx
 } vec_op_t;
+
+// Vector load/store control
+typedef enum logic [1:0] {
+   VEC_MEM_NONE  = 2'b00,
+   VEC_MEM_LOAD  = 2'b01,
+   VEC_MEM_STORE = 2'b10,
+   VEC_MEM_UNDEF = 2'bxx
+} vec_mem_op_t;
 
 
 typedef enum logic [1:0]{ // ALU input mux select
@@ -184,6 +245,32 @@ typedef enum logic [6:0] {
    VRELU  = 7'b011_0010,
    VDOT   = 7'b011_0011,
    VACLR  = 7'b011_0100,
+   // Vector load
+   VLD    = 7'b011_0101,
+   VLD1   = 7'b011_0110,
+   VLD2   = 7'b011_0111,
+   VLD3   = 7'b011_1000,
+   VLD4   = 7'b011_1001,
+   VLD5   = 7'b011_1010,
+   VLD6   = 7'b100_0010,
+   VLD7   = 7'b100_0011,
+   VLD8   = 7'b100_0100,
+   VLD9   = 7'b100_0101,
+   VLD10  = 7'b100_0110,
+   VLD11  = 7'b100_0111,
+
+   // Vector store
+   VST    = 7'b011_1011,
+   VST1   = 7'b011_1100,
+   VST2   = 7'b011_1101,
+   VST3   = 7'b011_1110,
+   VST4   = 7'b011_1111,
+   VST5   = 7'b100_1000,
+   VST6   = 7'b100_1001,
+   VST7   = 7'b100_1010,
+   VST8   = 7'b100_1011,
+   VST9   = 7'b101_0010,
+   VST10  = 7'b101_0011,
    
 
    UNDEF  = 7'bxxx_xxxx
@@ -194,16 +281,24 @@ typedef struct packed
 {
    alu_op_t alu_op;
    vec_op_t vec_op; // ML Alu opcode
+   vec_mem_op_t vec_mem_op; // Vector load/store control
    alu_mux_t srcA;
    alu_mux_t srcB;
    dest_sel_t dest;
    cond_code_t lcc_L;
-   rd_enable_t re_L; 
+   rd_enable_t re_L;
    wr_enable_t we_L;
 
-   logic vecRegLoad_L; // separate write enable for the vector register file (independent of the scalar register file)
-   logic accLoad_L; // load accumulator register
-   logic accClear; // clear accumulator register
+   vec_reg_load_t vecRegLoad_L; // separate write enable for the vector register file (independent of the scalar register file)
+   acc_load_t accLoad_L; // load accumulator register
+   acc_clear_t accClear; // clear accumulator register
+
+   vec_lane_t laneSel; // lane 0-3 for VLOAD/VSTORE
+   vec_lane_load_t loadLane_L; // load one 16-bit lane into temporary vector register
+   vec_clear_t clearVecLoad; // clear temporary vector load register
+   vec_write_src_t vecWriteSrc; // vector register write source
+
+   mar_src_t marSrc; // MAR write source
 } controlPts;
 
 `endif
