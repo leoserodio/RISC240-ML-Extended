@@ -10,7 +10,6 @@ Put these files/folders together:
     run_all_tests.ps1
     run_all_tests.bat
     run_quick_program.ps1
-    quick_program.asm
     tests/
 
 RUN ALL TESTS
@@ -44,8 +43,8 @@ RUN THE QUICK PROGRAM
 
 Or manually:
 
-    python MLASM.py quick_program.asm
-    python MLSIM.py quick_program.hex
+    python MLASM.py tests\quick_program.asm
+    python MLSIM.py tests\quick_program.hex
 
 Inside MLSIM:
 
