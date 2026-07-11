@@ -1,0 +1,6 @@
+First:
+git add .             
+git commit -m "EDIT NAME HERE"
+git push
+Then: 
+git push origin master => should return "everything up to date"

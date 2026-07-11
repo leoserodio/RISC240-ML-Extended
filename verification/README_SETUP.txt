@@ -23,6 +23,7 @@ RISC240GPU/
 ├── library.sv
 ├── alu.sv
 ├── regfile.sv
+├── adder.sv                (adder module could be inside accumulator if you want)
 ├── vector_regfile.sv
 ├── ML_alu.sv
 ├── dot_product_unit.sv
@@ -55,13 +56,13 @@ Put:
 inside:
     RISC240GPU/verification/
 
-4. Run on the AFS machine
+4. Run on the AFS machine MAKING SURE YOU HAVE ASSEMBLED THE TESTS ON YOUR MACHINE (created .hex)
 -------------------------
 
 From the project root:
 
     cd verification
-    python3 run_tests.py --rebuild
+    python3 run_tests.py --keep-output
 
 After the first compile, future runs can use:
 
@@ -69,7 +70,7 @@ After the first compile, future runs can use:
 
 Run one test:
 
-    python3 run_tests.py --test test01_add
+    python3 run_tests.py --test test01_add --rebuild --keep-output
 
 Keep logs and state dumps even for passing tests:
 
@@ -101,3 +102,9 @@ Then inspect:
     verification/build/test01_add/rtl_state.txt
 
 Only after test01 passes should you run the full suite.
+
+
+AFTER EVERY RTL CHANGE:
+
+cd ~/private/RISC240GPU/verification (or wherever you will run vcs)
+python3 run_tests.py

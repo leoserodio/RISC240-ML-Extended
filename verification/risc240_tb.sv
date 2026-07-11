@@ -25,8 +25,38 @@ module risc240_tb;
     integer tb_cycles;
     bit dumped;
 
+        /*
+         * When python launches the sim, it does for ex:
+         * ./simv +STATE=/tmp/test13/rtl_state.txt +MAX_CYCLES=50000
+         * Here, the plusargs are the +
+         * EXAMPLE:
+         * $value$plusargs("STATE=%s", state_file);
+         * means:
+         * "Did the simulator start with something like +STATE=...? If so, put that string into state_file."
+         * WHY:
+         * w/out plusargs you COULD write
+         * 
+         * initial begin
+         *    state_file = "rtl_state.txt";
+         *    max_cycles = 50000;
+         * end
+         * 
+         * But every simulation would always use those values.
+         * 
+         * Now with plusargs:
+         * The same compiled simulator can be configured differently each time you run it:
+         * ./simv +STATE=test1.txt +MAX_CYCLES=500
+         * or
+         * ./simv +STATE=test2.txt +MAX_CYCLES=100000
+         * 
+         * No need for recompilation.
+         * 
+         * TLDR: No recompilation is needed because the SystemVerilog source never changes. 
+         *       Only the runtime arguments (like the output filename or cycle limit) change.
+         */
+    
     initial begin
-        if (!$value$plusargs("STATE=%s", state_file))
+        if (!$value$plusargs("STATE=%s", state_file)) 
             state_file = "rtl_state.txt";
 
         if (!$value$plusargs("MAX_CYCLES=%d", max_cycles))
@@ -35,6 +65,7 @@ module risc240_tb;
         tb_cycles = 0;
         dumped = 0;
     end
+
 
     task automatic dump_state;
         integer address;
@@ -49,9 +80,10 @@ module risc240_tb;
                 $display("TB_ERROR: could not open state file %s", state_file);
                 $finish(2);
             end
-
+            // Here we can use the already built in "testbench" in the risc240 top to 
+            // track the states of the registers
             // Scalar architectural state
-            $fdisplay(fd, "PC=%04h", dut.pc);
+            $fdisplay(fd, "PC=%04h", dut.pc); 
             $fdisplay(fd, "IR=%04h", dut.ir);
             $fdisplay(fd, "FLAGS=%01h", dut.condCodes);
             $fdisplay(fd, "ACC=%08h", dut.accResultOut);
