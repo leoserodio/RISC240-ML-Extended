@@ -2,15 +2,15 @@
 
 ## Overview
 
-This project extends the Carnegie Mellon University RISC240 processor with custom vector and machine learning instructions. The processor was modified to support SIMD-style execution through a dedicated vector register file, vector ALU, dot-product unit, and accumulator while maintaining compatibility with the original scalar instruction set.
+This project adds onto the CMU RISC240 processor with custom vector and machine learning instructions. The processor was modified to support SIMD-style execution through an added vector register file, vector ALU, dot-product unit, and accumulator while maintaining compatibility with the original scalar instruction set and design flow of the RISC240 CPU.
 
-In addition to the hardware modifications, I developed a complete software toolchain for the processor, including a custom assembler, instruction-level simulator, and an automated RTL verification framework using Synopsys VCS. This verification flow allows assembly programs to be assembled, executed on the RTL, and automatically checked against expected architectural state before deploying the design to FPGA.
+In addition to the hardware modifications, I developed a custom assembler (similar to as240 from CMU), instruction-level simulator (similar to sim240 from CMU), and an automated RTL verification framework using Synopsys VCS (Python controlled VCS). This verification flow allows assembly programs to be assembled, executed on the RTL, and automatically checked against expected architectural state before synthesizing the new design to the FPGA.
 
 ---
 
 ## What I Worked On
 
-The goal of this project was to extend the original RISC240 architecture with machine learning acceleration while developing a complete verification flow to validate the processor before hardware implementation.
+The goal of this project was to add to the original RISC240 architecture with machine learning acceleration while developing a complete verification flow to validate the processor before i program the FPGA. 
 
 ### `datapath.sv`
 
