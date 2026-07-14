@@ -1,0 +1,30 @@
+MLASM v1.1 listing
+Address  Word  Description     Source
+=======  ====  ===============  ========================================
+                              ; Quick end-to-end program:
+                              ; Load two vectors, add them, store the result at $0110, and stop.
+                              
+0000     3040  LI/ADDI                  LI    R1, $0100
+0002     0100  immediate        
+0004     6A48  VLD                      VLD   V1, R1, 0
+0006     0000  immediate        
+0008     6A88  VLD                      VLD   V2, R1, 8
+000A     0008  immediate        
+000C     60CA  VADD                     VADD  V3, V1, V2
+000E     760B  VST                      VST   R1, V3, 16
+0010     0010  immediate        
+0012     FE00  STOP                     STOP
+                              
+                                      .ORG  $0100
+0100     0102  .DW                      .DW   $0102
+0102     0304  .DW                      .DW   $0304
+0104     0506  .DW                      .DW   $0506
+0106     0708  .DW                      .DW   $0708
+                              
+0108     0101  .DW                      .DW   $0101
+010A     0101  .DW                      .DW   $0101
+010C     0101  .DW                      .DW   $0101
+010E     0101  .DW                      .DW   $0101
+
+Symbols
+=======

@@ -1,41 +1,35 @@
-## RISC240-ML - Leo Serodio
+# RISC240-ML
 
-## Overview
+This project extends the CMU RISC240 processor with custom vector instructions for simple machine learning operations. The processor was modified to support SIMD-style execution by adding a vector register file, vector ALU, dot-product unit, and accumulator while keeping the original scalar instruction set intact.
 
-This project adds onto the CMU RISC240 processor with custom vector and machine learning instructions. The processor was modified to support SIMD-style execution through an added vector register file, vector ALU, dot-product unit, and accumulator while maintaining compatibility with the original scalar instruction set and design flow of the RISC240 CPU.
+To make it easier to develop and test new instructions, I also built a custom assembler and instruction-level simulator in Python based on the concepts of the `as240` assembler and `sim240` simulator used in CMU's 18-240 course. I used ChatGPT to help implement parts of the Python code while verifying the assembler and simulator throughout development. The project also includes an automated RTL verification flow using Synopsys VCS.
 
-In addition to the hardware modifications, I developed a custom assembler (similar to as240 from CMU), instruction-level simulator (similar to sim240 from CMU), and an automated RTL verification framework using Synopsys VCS (Python controlled VCS). This verification flow allows assembly programs to be assembled, executed on the RTL, and automatically checked against expected architectural state before synthesizing the new design to the FPGA.
+## My Contributions
 
----
-
-## What I Worked On
-
-The goal of this project was to add to the original RISC240 architecture with machine learning acceleration while developing a complete verification flow to validate the processor before i program the FPGA. 
+The focus of this project was extending the RISC240 architecture with vector hardware and creating a workflow for writing, testing, and verifying new instructions before running them on the FPGA.
 
 ### `datapath.sv`
 
-Modified the processor datapath to integrate the custom vector hardware, including:
+Modified the processor datapath to add:
 
 - Vector register file
 - Vector ALU
 - Dot-product unit
 - Accumulator
-- Vector load/store datapaths
-- Additional control signals for vector execution
+- Additional datapaths and control signals for vector execution
 
 ### `controlpath.sv`
 
-Extended the processor control FSM to support the custom vector instruction set by adding:
+Extended the control FSM to support the new instruction set by adding states for:
 
-- Vector arithmetic states
-- Vector load/store operations
+- Vector arithmetic
+- Vector load and store operations
 - Dot-product execution
 - Accumulator control
-- Additional vector control signals
 
 ### `ML_alu.sv`
 
-Implemented a dedicated vector ALU supporting:
+Implemented a vector ALU supporting:
 
 - Vector addition
 - Vector multiplication
@@ -44,80 +38,43 @@ Implemented a dedicated vector ALU supporting:
 
 ### `vector_regfile.sv`
 
-Implemented an 8-entry, 64-bit vector register file providing:
-
-- Two read ports
-- One write port
-- Parallel vector operand access
-- Independent vector register addressing
+Designed an 8-entry, 64-bit vector register file with two read ports and one write port for parallel operand access.
 
 ### `dot_product_unit.sv`
 
-Implemented an 8-lane signed dot-product engine using parallel multipliers with accumulation into a 32-bit result.
+Implemented an 8-lane signed dot-product unit that performs parallel multiplication and accumulates the result.
 
 ### `accumulator.sv`
 
-Implemented a dedicated accumulator used by the dot-product instruction to support machine learning reduction operations.
+Added an accumulator used by the dot-product instruction.
 
 ### `MLASM.py`
 
-Developed a custom assembler supporting both the original RISC240 instruction set and the new vector instructions. The assembler generates:
-
-- `.hex` files for RTL simulation
-- `.coe` files for Vivado Block Memory initialization
-- Assembly listings
-- Symbol tables
+Built a Python assembler based on the ideas behind CMU's `as240` assembler. It supports both the original RISC240 instructions and the custom vector instructions, generating memory images for simulation and FPGA synthesis.
 
 ### `MLSIM.py`
 
-Implemented an instruction-level simulator capable of executing assembled programs and displaying the processor's architectural state for software debugging.
+Built an instruction-level simulator, inspired by CMU's `sim240`, to execute assembled programs and inspect the processor state during software development.
 
 ### `verification/`
 
-Developed an automated RTL verification framework consisting of:
+Created an automated verification flow that:
 
-- SystemVerilog testbench
-- Python regression runner
-- Automated architectural state checking
-- 18 assembly test programs covering scalar and vector functionality
+- Assembles test programs
+- Runs RTL simulations using Synopsys VCS
+- Compares the final processor state against expected results
 
----
+The current test suite contains 18 assembly programs covering both the original processor and the new vector instructions.
 
-## Features
+## Results
 
-- 16-bit RISC240 processor
-- 8 × 64-bit vector register file
-- Custom SIMD instruction set
-- Vector addition
-- Vector multiplication
-- ReLU activation
-- Dot-product instruction with accumulator
-- Vector load/store instructions
-- Custom assembler
-- Instruction-level simulator
-- Automated RTL regression testing using Synopsys VCS
-- Vivado-compatible memory generation
-- FPGA-ready implementation
+- Extended the RISC240 processor with custom SIMD instructions
+- Added vector arithmetic and dot-product hardware
+- Built a custom assembler and instruction-level simulator
+- Automated RTL verification using Synopsys VCS
+- Successfully synthesized the design for FPGA implementation
 
----
-
-## Verification
-
-The verification framework automatically executes assembly programs on the RTL using Synopsys VCS.
-
-For each test:
-
-1. Assemble the program into machine code.
-2. Load the generated memory image into the RTL simulation.
-3. Execute the processor until the `STOP` instruction.
-4. Capture the final architectural state.
-5. Compare register, vector register, accumulator, and memory contents against expected results.
-
-The current regression suite contains **18 automated tests** covering both scalar and vector functionality.
-
----
-
-## Technologies
+## Tools Used
 
 - SystemVerilog
 - Python
@@ -125,12 +82,7 @@ The current regression suite contains **18 automated tests** covering both scala
 - Xilinx Vivado
 - FPGA Design
 - RTL Design
-- Processor Design
 - Computer Architecture
-- SIMD
-- Machine Learning Hardware Acceleration
-
----
 
 ## Repository Structure
 
