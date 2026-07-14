@@ -1,26 +1,26 @@
 # RISC240-ML
 
-This project extends the CMU RISC240 processor by adding a small vector instruction set for machine learning style operations. I added a vector register file, vector ALU, dot-product unit, and accumulator while keeping the original scalar processor working.
+This project extends the CMU RISC240 processor by adding a custom vector instruction set for basic machine learning operations. I modified the processor by adding a vector register file, vector ALU, dot-product unit, and accumulator while keeping the original scalar processor working.
 
-To make writing programs easier, I also made a Python assembler and instruction-level simulator based on the ideas behind the `as240` assembler and `sim240` simulator from CMU's 18-240 course. I used ChatGPT to help write parts of the Python code while checking everything against the ISA and test programs as I went. I also put together an automated verification flow using Synopsys VCS so I could quickly test new instructions before running them on the FPGA.
+To make writing and testing programs easier, I also built a Python assembler and instruction-level simulator based on the concepts behind the `as240` assembler and `sim240` simulator used in CMU's 18-240 course. I used ChatGPT to help implement parts of the Python code while checking everything against the ISA and my test programs throughout development. I also put together an automated verification flow using Synopsys VCS so I could quickly test hardware changes before synthesizing the design.
 
-## Main changes
+## Main Changes
 
 ### Datapath
 
-Most of the hardware work was done in `datapath.sv`. This is where I integrated the new vector hardware:
+Most of the hardware work was done in `datapath.sv`, where I integrated the new vector hardware:
 
 - Vector register file
 - Vector ALU
 - Dot-product unit
 - Accumulator
-- New datapaths needed for vector instructions
+- New datapaths and control signals for vector execution
 
-### Control logic
+### Control Logic
 
-`controlpath.sv` was updated with the extra states and control signals needed for the new instructions, including vector arithmetic, vector loads/stores, and dot-product execution.
+I updated `controlpath.sv` with the additional states and control signals needed for the new instructions, including vector arithmetic, vector load/store operations, and dot-product execution.
 
-### New hardware modules
+### New Hardware Modules
 
 I added several new modules:
 
@@ -29,29 +29,29 @@ I added several new modules:
 - `dot_product_unit.sv` - parallel dot-product hardware
 - `accumulator.sv` - accumulator used by the dot-product instruction
 
-### Assembler and simulator
+### Assembler and Simulator
 
-I wrote a Python assembler (`MLASM.py`) that supports both the original RISC240 instructions and the new vector instructions. It generates memory files for both simulation and Vivado.
+I wrote a Python assembler (`MLASM.py`) that supports both the original RISC240 instructions and the new vector instructions. It generates memory files for simulation and Vivado.
 
-I also wrote a simple instruction-level simulator (`MLSIM.py`) so I could test assembly programs without running RTL every time.
+I also wrote an instruction-level simulator (`MLSIM.py`) so I could test assembly programs without running RTL every time.
 
 ### Verification
 
-The verification flow automatically:
+To verify the processor, I wrote 18 assembly test programs covering both the original RISC240 instruction set and the new vector instructions. The verification flow automatically assembles each program, loads it into the RTL simulation, runs the processor in Synopsys VCS until the `STOP` instruction, and compares the final architectural state against the expected results.
 
-- Assembles the program
-- Runs the RTL in Synopsys VCS
-- Waits for the processor to halt
-- Compares the final processor state against the expected results
+## Future Work
 
-Right now there are 18 assembly test programs covering both the original processor and the new vector instructions.
+The next step for this project is to build a small library of complete assembly programs that use the custom vector instruction set. Instead of only testing individual instructions, these programs will implement larger machine learning operations that can be reused as software libraries.
 
-## Tools
+## Tools Used
 
 - SystemVerilog
 - Python
 - Synopsys VCS
 - Xilinx Vivado
+- FPGA Design
+- RTL Design
+- Computer Architecture
 
 ## Repository Structure
 
