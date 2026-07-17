@@ -16,7 +16,7 @@ Most of the hardware work was done in `datapath.sv`, where I integrated the new 
 - Accumulator
 - New datapaths and control signals for vector execution
 
-# MAR & MDR
+### MAR & MDR
 In addition, because of the RISC240 constraints (16-bit wide MAR and MDR), I had to find clever ways of loading and storing accumulator outputs (32-bit). This was done by inserting a new input to the MAR (via a mux),
 which was "MAR + 2" so I was able to store the last 16 bits of the accumulator in the next memory address. 
 
