@@ -17,6 +17,7 @@ Supported vector/ML instructions:
     VACLR
     VLD   vd, rs1, imm
     VST   rs1, vs2, imm
+    ACCST rs1, imm
 
 Pseudo-operations:
     .ORG address
@@ -48,7 +49,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-VERSION = "1.1"
+VERSION = "1.2"
 
 
 # ---------------------------------------------------------------------------
@@ -91,6 +92,7 @@ OPCODES: dict[str, int] = {
     "VACLR": 0b011_0100,
     "VLD":   0b011_0101,
     "VST":   0b011_1011,
+    "ACCST": 0b010_0001,
 }
 
 PSEUDO_OPS = {".ORG", ".DW", ".EQU"}
@@ -377,7 +379,7 @@ def instruction_size(opcode: str, line: Line) -> int:
 
     if (
         opcode in IMMEDIATE_OPS
-        or opcode in {"LI", "LW", "SW", "VLD", "VST"}
+        or opcode in {"LI", "LW", "SW", "VLD", "VST", "ACCST"}
         or opcode in BRANCH_OPS
     ):
         return 4
@@ -811,6 +813,28 @@ def emit_instruction(
                     rs1,
                     rs2,
                 ),
+                mnemonic,
+            ),
+            (
+                immediate,
+                "immediate",
+            ),
+        ]
+
+
+    if mnemonic == "ACCST":
+        require_operands(line, 2)
+
+        rs1 = parse_register(operands[0], "R", line)
+        immediate = validate_word_value(
+            resolve_value(operands[1], labels, equates, line),
+            line,
+            "immediate",
+        )
+
+        return [
+            (
+                encode_instruction(OPCODES[mnemonic], 0, rs1, 0),
                 mnemonic,
             ),
             (

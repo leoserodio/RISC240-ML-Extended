@@ -70,9 +70,22 @@ module datapath (
 
    assign memAddr = {marOut, 1'b0};
 
+   // ML defs
+   logic [63:0] vecRS1, vecRS2;
+   logic [63:0] vecWriteData;
+   logic [63:0] vecAluResult;
+   logic signed [31:0] dotResult;
+   logic signed [31:0] accResult;
+   logic [15:0] vecStoreData;
+   logic [15:0] inputMDR;
+   assign vecRS1Out       = vecRS1;
+   assign vecRS2Out       = vecRS2;
+   assign vecAluResultOut = vecAluResult;
+   assign vecWriteDataOut = vecWriteData;
+   assign dotResultOut    = dotResult;
+   assign accResultOut    = accResult;
 
    
-
    // Instantiate the modules that we need:
    reg_file rfile(
            .outRS1(regRS1),
@@ -115,9 +128,25 @@ module datapath (
                                      .clock(clock), .reset_L(reset_L));*/
    // MDR input logic
    
-   logic [15:0] vecStoreData;
-   logic [15:0] inputMDR;
+ 
+   /*
    assign inputMDR = (cPts.vec_mem_op == VEC_MEM_STORE) ? vecStoreData : newMDR; 
+   */
+   always_comb begin
+        case (cPts.mdrSrc)
+            MDR_FROM_VECTOR:
+                inputMDR = vecStoreData;
+
+            MDR_FROM_ACC_LOW:
+                inputMDR = accResult[15:0];
+
+            MDR_FROM_ACC_HIGH:
+                inputMDR = accResult[31:16];
+
+            default:
+                inputMDR = newMDR;
+        endcase
+    end
    // If we are doing a vector store operation, the MDR input comes from vecStoreData
    register #(.WIDTH(16)) memDataReg(
     .out(MDRout), 
@@ -150,17 +179,7 @@ module datapath (
 
    // First we add our reg file that will hold vector values for our more complex deep learning applications
    // We will reuse the instruction format from the original RISC240 (as such we have rs1, rs2, rd)
-   logic [63:0] vecRS1, vecRS2;
-   logic [63:0] vecWriteData;
-   logic [63:0] vecAluResult;
-   logic signed [31:0] dotResult;
-   logic signed [31:0] accResult;
-   assign vecRS1Out       = vecRS1;
-   assign vecRS2Out       = vecRS2;
-   assign vecAluResultOut = vecAluResult;
-   assign vecWriteDataOut = vecWriteData;
-   assign dotResultOut    = dotResult;
-   assign accResultOut    = accResult;
+   
 
    vector_regfile vfile(
     .outRS1(vecRS1),

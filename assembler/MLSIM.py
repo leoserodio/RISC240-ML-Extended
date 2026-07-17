@@ -19,6 +19,7 @@ Vector arithmetic follows the supplied RTL:
     VDOT   signed int8 dot product, accumulated into signed 32-bit ACC
     VLD    loads four consecutive 16-bit words into one 64-bit vector
     VST    stores one 64-bit vector as four consecutive 16-bit words
+    ACCST  stores ACC as two consecutive 16-bit words
 
 Usage:
     python MLSIM.py program.hex
@@ -36,7 +37,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-VERSION = "1.0"
+VERSION = "1.1"
 MEMORY_BYTES = 0x10000
 MEMORY_WORDS = MEMORY_BYTES // 2
 
@@ -74,6 +75,7 @@ OPCODES: dict[str, int] = {
     "VACLR": 0b011_0100,
     "VLD":   0b011_0101,
     "VST":   0b011_1011,
+    "ACCST": 0b010_0001,
 }
 
 MNEMONIC_BY_OPCODE = {value: name for name, value in OPCODES.items()}
@@ -94,6 +96,7 @@ TWO_WORD_INSTRUCTIONS = {
     "BRNZ",
     "VLD",
     "VST",
+    "ACCST",
 }
 
 
@@ -498,6 +501,10 @@ class RISC240Simulator:
             assert imm is not None
             return f"VST R{rs1}, V{rs2}, ${imm:04X}"
 
+        if m == "ACCST":
+            assert imm is not None
+            return f"ACCST R{rs1}, ${imm:04X}"
+
         return m
 
     # ------------------------------------------------------------------
@@ -679,6 +686,14 @@ class RISC240Simulator:
 
             for lane, value in enumerate(words):
                 self.write_word(u16(base + 2 * lane), value)
+
+
+        elif m == "ACCST":
+            assert imm is not None
+            base = u16(a + imm)
+            acc_bits = u32(self.acc)
+            self.write_word(base, acc_bits & 0xFFFF)
+            self.write_word(u16(base + 2), (acc_bits >> 16) & 0xFFFF)
 
         elif m == "STOP":
             self.halted = True

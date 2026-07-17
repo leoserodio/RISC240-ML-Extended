@@ -150,6 +150,34 @@ def verify_test(name: str, sim: Any) -> None:
         actual = [mem(sim, 0x0110 + 2 * i) for i in range(4)]
         require(actual == expected, f"integration store mismatch: {actual!r}")
 
+    elif name == "test19_accst":
+        require(sim.acc == -130048, "ACC should be -130048 ($FFFE0400)")
+
+        require(
+            mem(sim, 0x0200) == 0x0000,
+            "memory[$0200] should remain $0000",
+        )
+        require(
+            mem(sim, 0x0202) == 0x0000,
+            "memory[$0202] should remain $0000",
+        )
+        require(
+            mem(sim, 0x0204) == 0xF808,
+            "memory[$0204] should be $F808",
+        )
+        require(
+            mem(sim, 0x0206) == 0x0001,
+            "memory[$0206] should be $0001",
+        )
+        require(
+            mem(sim, 0x0208) == 0x0400,
+            "memory[$0208] should be $0400",
+        )
+        require(
+            mem(sim, 0x020A) == 0xFFFE,
+            "memory[$020A] should be $FFFE",
+        )
+
     else:
         raise AssertionError(f"No verifier exists for {name}")
 

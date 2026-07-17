@@ -1,4 +1,4 @@
-MLASM v1.1 listing
+MLASM v1.2 listing
 Address  Word  Description     Source
 =======  ====  ===============  ========================================
                               ; Current RTL behavior: BRNZ branches when N OR Z is set.

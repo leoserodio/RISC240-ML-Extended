@@ -107,6 +107,14 @@ module risc240_tb;
             $fdisplay(fd, "V6=%016h", dut.dp.vfile.v6);
             $fdisplay(fd, "V7=%016h", dut.dp.vfile.v7);
 
+            // Accumulator store result locations
+            $fdisplay(fd, "M0200=%04h", dut.memmod.memsim.mem[16'h0200]);
+            $fdisplay(fd, "M0202=%04h", dut.memmod.memsim.mem[16'h0202]);
+            $fdisplay(fd, "M0204=%04h", dut.memmod.memsim.mem[16'h0204]);
+            $fdisplay(fd, "M0206=%04h", dut.memmod.memsim.mem[16'h0206]);
+            $fdisplay(fd, "M0208=%04h", dut.memmod.memsim.mem[16'h0208]);
+            $fdisplay(fd, "M020A=%04h", dut.memmod.memsim.mem[16'h020A]);
+
             // Dump the data region used by the supplied regression tests.
             // memory_simulation is byte-addressed, and valid words are at
             // even addresses.

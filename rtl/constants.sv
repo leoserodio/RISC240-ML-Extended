@@ -80,9 +80,6 @@ typedef enum logic{
    CLEAR_VEC_LOAD = 1'b1
 } vec_clear_t; // Clear vector load register operation
 
-// ML ADDITIONS END HERE
-// *****************************************************************
-
 typedef enum logic[3:0]{ // ALU operation select
    F_A_PLUS_B    = 4'b0000,
    F_A_MINUS_B   = 4'b0001,
@@ -122,7 +119,16 @@ typedef enum logic [1:0] {
    VEC_MEM_UNDEF = 2'bxx
 } vec_mem_op_t;
 
+// MDR input source
+typedef enum logic [1:0] {
+   MDR_FROM_BUS     = 2'b00, // normal scalar memory operation
+   MDR_FROM_VECTOR  = 2'b01, // VST selected vector lane
+   MDR_FROM_ACC_LOW = 2'b10, // ACC[15:0]
+   MDR_FROM_ACC_HIGH= 2'b11  // ACC[31:16]
+} mdr_src_t;
 
+// ML ADDITIONS END HERE
+// *****************************************************************
 typedef enum logic [1:0]{ // ALU input mux select
    MUX_REG       = 2'b00,
    MUX_PC        = 2'b01,
@@ -259,7 +265,13 @@ typedef enum logic [6:0] {
    VLD10  = 7'b100_0110,
    VLD11  = 7'b100_0111,
 
-   
+   ACCST  = 7'b010_0001,
+   ACCST1 = 7'b010_0010,
+   ACCST2 = 7'b010_0011,
+   ACCST3 = 7'b010_0100,
+   ACCST4 = 7'b010_0101,
+   ACCST5 = 7'b010_0110,
+   ACCST6 = 7'b010_0111,
    // Vector store
    VST    = 7'b011_1011,
    VST1   = 7'b011_1100,
@@ -299,6 +311,7 @@ typedef struct packed
    vec_write_src_t vecWriteSrc; // vector register write source
 
    mar_src_t marSrc; // MAR write source
+   mdr_src_t mdrSrc; // selects normal, vector, or ACC data for MDR
 } controlPts;
 
 `endif

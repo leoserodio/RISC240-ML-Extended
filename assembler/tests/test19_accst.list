@@ -1,0 +1,116 @@
+MLASM v1.2 listing
+Address  Word  Description     Source
+=======  ====  ===============  ========================================
+                              ; ============================================================
+                              ; test19_accst.asm
+                              ;
+                              ; Verifies ACCST:
+                              ;   1. Positive 32-bit accumulator result
+                              ;   2. Low/high word memory ordering
+                              ;   3. Base + immediate addressing
+                              ;   4. Negative 32-bit accumulator result
+                              ;   5. VACLR between independent dot products
+                              ;
+                              ; Expected:
+                              ;
+                              ;   Positive dot:
+                              ;       8 * (127 * 127) = 129032 = $0001F808
+                              ;
+                              ;       M[$0204] = $F808
+                              ;       M[$0206] = $0001
+                              ;
+                              ;   Negative dot:
+                              ;       8 * (-128 * 127) = -130048 = $FFFE0400
+                              ;
+                              ;       M[$0208] = $0400
+                              ;       M[$020A] = $FFFE
+                              ; ============================================================
+                              
+0000     3040  LI/ADDI                  LI      R1, $0100      ; Input vector A
+0002     0100  immediate        
+0004     3080  LI/ADDI                  LI      R2, $0108      ; Input vector B
+0006     0108  immediate        
+0008     30C0  LI/ADDI                  LI      R3, $0110      ; Negative input vector
+000A     0110  immediate        
+000C     3100  LI/ADDI                  LI      R4, $0200      ; Result memory base
+000E     0200  immediate        
+                              
+                              ; ------------------------------------------------------------
+                              ; Positive ACCST test
+                              ; ------------------------------------------------------------
+                              
+0010     6A48  VLD                      VLD     V1, R1, 0      ; V1 = eight signed 127 values
+0012     0000  immediate        
+0014     6A90  VLD                      VLD     V2, R2, 0      ; V2 = eight signed 127 values
+0016     0000  immediate        
+                              
+0018     6800  VACLR                    VACLR
+001A     660A  VDOT                     VDOT    V1, V2         ; ACC = $0001F808
+                              
+001C     4220  ACCST                    ACCST   R4, 4          ; Store at $0204 and $0206
+001E     0004  immediate        
+                              
+                              ; ------------------------------------------------------------
+                              ; Negative ACCST test
+                              ; ------------------------------------------------------------
+                              
+0020     6AD8  VLD                      VLD     V3, R3, 0      ; V3 = eight signed -128 values
+0022     0000  immediate        
+                              
+0024     6800  VACLR                    VACLR
+0026     661A  VDOT                     VDOT    V3, V2         ; ACC = $FFFE0400
+                              
+0028     4220  ACCST                    ACCST   R4, 8          ; Store at $0208 and $020A
+002A     0008  immediate        
+                              
+002C     FE00  STOP                     STOP
+                              
+                              ; ------------------------------------------------------------
+                              ; Test data
+                              ; ------------------------------------------------------------
+                              
+                                      .ORG    $0100
+                              
+                              ; Eight signed 127 values
+                              VECTOR_POS_A:
+0100     7F7F  .DW                      .DW     $7F7F
+0102     7F7F  .DW                      .DW     $7F7F
+0104     7F7F  .DW                      .DW     $7F7F
+0106     7F7F  .DW                      .DW     $7F7F
+                              
+                              ; Eight signed 127 values
+                              VECTOR_POS_B:
+0108     7F7F  .DW                      .DW     $7F7F
+010A     7F7F  .DW                      .DW     $7F7F
+010C     7F7F  .DW                      .DW     $7F7F
+010E     7F7F  .DW                      .DW     $7F7F
+                              
+                              ; Eight signed -128 values
+                              VECTOR_NEG:
+0110     8080  .DW                      .DW     $8080
+0112     8080  .DW                      .DW     $8080
+0114     8080  .DW                      .DW     $8080
+0116     8080  .DW                      .DW     $8080
+                              
+                              ; ------------------------------------------------------------
+                              ; Result area
+                              ; ------------------------------------------------------------
+                              
+                                      .ORG    $0200
+                              
+                              RESULTS:
+0200     0000  .DW                      .DW     $0000          ; $0200 untouched
+0202     0000  .DW                      .DW     $0000          ; $0202 untouched
+                              
+0204     0000  .DW                      .DW     $0000          ; $0204 positive low
+0206     0000  .DW                      .DW     $0000          ; $0206 positive high
+                              
+0208     0000  .DW                      .DW     $0000          ; $0208 negative low
+020A     0000  .DW                      .DW     $0000          ; $020A negative high
+
+Symbols
+=======
+RESULTS                  $0200
+VECTOR_NEG               $0110
+VECTOR_POS_A             $0100
+VECTOR_POS_B             $0108

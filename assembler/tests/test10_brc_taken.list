@@ -1,4 +1,4 @@
-MLASM v1.1 listing
+MLASM v1.2 listing
 Address  Word  Description     Source
 =======  ====  ===============  ========================================
 0000     3040  LI/ADDI          LI    R1, $FFFF
