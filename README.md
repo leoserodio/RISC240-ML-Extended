@@ -30,12 +30,16 @@ I updated `controlpath.sv` with the additional states and control signals needed
 
 ### New Hardware Modules
 
-I added several new modules:
+I added several new hardware modules:
 
-- `ML_alu.sv` - vector addition, multiplication, ReLU, and pass-through operations
+- `ML_alu.sv` - performs vector addition, multiplication, ReLU, and pass-through operations
 - `vector_regfile.sv` - 8-entry, 64-bit vector register file
-- `dot_product_unit.sv` - parallel dot-product hardware
-- `accumulator.sv` - accumulator used by the dot-product instruction
+- `vector_load_unit.sv` - loads four consecutive 16-bit memory words into a vector register
+- `vector_store_unit.sv` - extracts vector elements for sequential memory stores
+- `dot_product_unit.sv` - parallel 4-lane dot-product hardware
+- `accumulator.sv` - 32-bit accumulator used by the dot-product instruction
+- `int8_mult.sv` - signed 8-bit multiplier used by the dot-product unit
+- `adder.sv` - parameterized adder used by the accumulator
 
 ### Assembler and Simulator
 
